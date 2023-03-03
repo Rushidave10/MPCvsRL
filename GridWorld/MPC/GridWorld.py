@@ -1,3 +1,4 @@
+
 import numpy as np
 import pygame
 
@@ -38,9 +39,7 @@ class GridWorldEnv(gym.Env):
 
     def _get_info(self):
         return {
-            "distance": np.linalg.norm(
-                self._agent_location - self._target_location, ord=1
-            )
+            "target_location": self._target_location
         }
 
     def reset(self, seed=None, options=None):
@@ -49,7 +48,7 @@ class GridWorldEnv(gym.Env):
         self._agent_location = np.array([0, 0])
 
         self._target_location = self._agent_location
-        while np.array_equal(self._target_location, np.floor(self._agent_location)):
+        while np.array_equal(self._target_location, np.rint(self._agent_location)):
             self._step_count = []
             self._visited = []
             self.mesh = np.zeros((self.no_cells, self.no_cells))
@@ -72,11 +71,11 @@ class GridWorldEnv(gym.Env):
 
         for i in range(self.no_cells):
             for j in range(self.no_cells):
-                if (np.floor(self._agent_location) == np.array([i, j])).all():
+                if (np.rint(self._agent_location) == np.array([i, j])).all():
                     self.mesh[i, j] += 1
 
-        terminated = np.array_equal(np.floor(self._agent_location), self._target_location)
-        reward = -np.linalg.norm(self._agent_location - self._target_location,ord=1)
+        terminated = np.array_equal(np.rint(self._agent_location), self._target_location)
+        reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1)
         observation = self._get_obs()
         info = self._get_info()
 
@@ -105,7 +104,7 @@ class GridWorldEnv(gym.Env):
 
         for i in range(self.no_cells):
             for j in range(self.no_cells):
-                pygame.draw.rect(canvas, (255 - self.mesh[i, j]*5, 255, 255),
+                pygame.draw.rect(canvas, (255 - self.mesh[i, j] * 30, 255 - self.mesh[i, j] * 30, 255),
                                  pygame.Rect([pix_square_size * i, pix_square_size * j],
                                              (pix_square_size, pix_square_size)))
 
@@ -113,6 +112,7 @@ class GridWorldEnv(gym.Env):
                                                           (pix_square_size, pix_square_size)))
 
         pygame.draw.circle(canvas, (0, 0, 255), (self._agent_location + 0.5) * pix_square_size, pix_square_size / 3)
+
         for x in range(self.size + 1):
             pygame.draw.line(canvas, color=0,
                              start_pos=(0, pix_square_size * x),
@@ -139,4 +139,3 @@ class GridWorldEnv(gym.Env):
         if self.window is not None:
             pygame.display.quit()
             pygame.quit()
-
