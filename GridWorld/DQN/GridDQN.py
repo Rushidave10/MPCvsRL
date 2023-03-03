@@ -12,10 +12,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-
 gym.register("GridWorld-v0", entry_point="DGridWorld:GridWorldEnv")
 env = gym.make("GridWorld-v0", size=5)
-
 
 obs, info = env.reset()
 rewards = []
@@ -56,6 +54,7 @@ class DQN(nn.Module):
         x = F.relu(self.layer2(x))
         return self.layer3(x)
 
+
 # BATCH_SIZE is the number of transitions sampled from the replay buffer
 # GAMMA is the discount factor as mentioned in the previous section
 # EPS_START is the starting value of epsilon
@@ -95,7 +94,7 @@ def select_action(state):
     global steps_done
     sample = random.random()
     eps_threshold = EPS_END + (EPS_START - EPS_END) * \
-        math.exp(-1. * steps_done / EPS_DECAY)
+                    math.exp(-1. * steps_done / EPS_DECAY)
     steps_done += 1
     if sample > eps_threshold:
         with torch.no_grad():
@@ -135,6 +134,7 @@ def plot_durations(show_result=False):
         else:
             display.display(plt.gcf())
 
+
 def optimize_model():
     if len(memory) < BATCH_SIZE:
         return
@@ -147,9 +147,9 @@ def optimize_model():
     # Compute a mask of non-final states and concatenate the batch elements
     # (a final state would've been the one after which simulation ended)
     non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                          batch.next_state)), device=device, dtype=torch.bool)
+                                            batch.next_state)), device=device, dtype=torch.bool)
     non_final_next_states = torch.cat([s for s in batch.next_state
-                                                if s is not None])
+                                       if s is not None])
     state_batch = torch.cat(batch.state)
     action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward)
@@ -181,10 +181,8 @@ def optimize_model():
     torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
     optimizer.step()
 
-if torch.cuda.is_available():
-    num_episodes = 600
-else:
-    num_episodes = 50
+
+num_episodes = 50
 
 for i_episode in range(num_episodes):
     # Initialize the environment and get it's state
