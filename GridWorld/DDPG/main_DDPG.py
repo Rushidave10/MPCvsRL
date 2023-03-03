@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 from GridWorld.DDPG.ddpg_backend import Agent
 import numpy as np
 import gymnasium as gym
@@ -37,6 +39,5 @@ for i in range(30):
 
     print('episode ', i, 'score %.2f' % score,
           'trailing 100 games avg %.3f' % np.mean(score_history[-100:]))
+
 env.close()
-# filename = 'gridworld_random_target.png'
-# plotLearning(score_history, filename, window=100)

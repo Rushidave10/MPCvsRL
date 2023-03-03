@@ -59,6 +59,8 @@ class GridWorldEnv(gym.Env):
         return observation, info
 
     def step(self, action):
+        truncated = False
+        terminated = False
         direction = action
         self._agent_location = np.clip(self._agent_location + direction, a_min=0, a_max=self.size - 1)
 
@@ -66,17 +68,16 @@ class GridWorldEnv(gym.Env):
             for j in range(self.no_cells):
                 if (np.floor(self._agent_location) == np.array([i, j])).all():
                     self.mesh[i, j] += 1
-        # reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1)
 
-        if np.array_equal(np.floor(self._agent_location), self._target_location):
+        if np.array_equal(self._agent_location, self._target_location):
             terminated = True
-            reward = +1
-        elif np.max(self.mesh) == 250:
-            terminated = True
-            reward = -10
+            reward = +100
+        elif np.max(self.mesh) == 5:
+            truncated = True
+            reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1)*10
         else:
             terminated = False
-            reward = -0.1
+            reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1)
 
         observation = self._get_obs()
         info = self._get_info()
@@ -84,7 +85,7 @@ class GridWorldEnv(gym.Env):
         if self.render_mode == "human":
             self._render_frame()
 
-        return observation, reward, terminated, False, info
+        return observation, reward, terminated, truncated, info
 
     def render(self):
         if self.render_mode == "rgb_array":
