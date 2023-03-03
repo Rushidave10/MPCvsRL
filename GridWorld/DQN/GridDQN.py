@@ -13,8 +13,8 @@ import torch.optim as optim
 import torch.nn.functional as F
 
 
-gym.register("GridWorldEnv-v0", entry_point="GridWorldEnv:GridWorldEnv")
-env = gym.make("GridWorldEnv-v0", size=5)
+gym.register("GridWorld-v0", entry_point="DGridWorld:GridWorldEnv")
+env = gym.make("GridWorld-v0", size=5)
 
 
 obs, info = env.reset()
@@ -227,6 +227,3 @@ print('Complete')
 plot_durations(show_result=True)
 plt.ioff()
 plt.show()
-
-
-
