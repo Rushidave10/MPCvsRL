@@ -1,10 +1,7 @@
-from ddpg_backend import Agent
-import gym
+from GridWorld.DDPG.ddpg_backend import Agent
 import numpy as np
-from utils import plotLearning
 import gymnasium as gym
 from gymnasium.wrappers import FlattenObservation
-import matplotlib.pyplot as plt
 
 SIZE = 5
 gym.register("GridWorldEnv-v0", entry_point="CGridWorldEnv:GridWorldEnv")
