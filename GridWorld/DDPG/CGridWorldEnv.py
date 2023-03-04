@@ -69,7 +69,7 @@ class GridWorldEnv(gym.Env):
         for i in range(self.no_cells):
             for j in range(self.no_cells):
                 if (np.floor(self._agent_location) == np.array([i, j])).all():
-                    if self.vmesh[i, j] <= 127:
+                    if self.vmesh[i, j] <= 120:
                         self.vmesh[i, j] += 1
 
         if np.array_equal(self._agent_location, self._target_location):
