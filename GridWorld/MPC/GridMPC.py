@@ -32,7 +32,6 @@ in_constraints = opt.input_range_constraint(sys, [-1, -1], [1, 1])
 state_constraints = opt.state_range_constraint(sys, [0, 0], [SIZE - 1, SIZE - 1])
 all_constraints = [in_constraints, state_constraints]
 
-action = np.array([0, 1])
 timepts = np.linspace(0, 100, 401, endpoint=True)
 
 for idx in range(len(timepts)):
@@ -44,10 +43,8 @@ for idx in range(len(timepts)):
                            constraints=all_constraints,
                            return_states=True,
                            terminal_cost=terminal_cost,
-
                            )
     _action = result.inputs[0][0], result.inputs[1][0]
-
     action = _action
     observation, _, done, _, _ = env.step(action)
 
