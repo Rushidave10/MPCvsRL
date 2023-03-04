@@ -14,6 +14,7 @@ class GridWorldEnv(gym.Env):
         self.size = size
         self.window_size = 800
         self.no_cells = self.size % self.window_size
+        self.mesh = np.zeros((self.no_cells, self.no_cells))
         self.vmesh = np.zeros((self.no_cells, self.no_cells))
         self.Random_target = random_target
         self.Random_start = random_start
@@ -42,7 +43,7 @@ class GridWorldEnv(gym.Env):
             self._agent_location = np.random.randint(0, self.size - 1, size=2)
         else:
             self._agent_location = np.array([0, 0])
-
+        self.mesh = np.zeros((self.window_size, self.window_size))
         self._target_location = self._agent_location
         while np.array_equal(self._target_location, np.floor(self._agent_location)):
 
@@ -74,7 +75,7 @@ class GridWorldEnv(gym.Env):
         if np.array_equal(self._agent_location, self._target_location):
             terminated = True
             reward = +100
-        elif np.max(self.vmesh) == 127:
+        elif np.max(self.mesh) == 127:
             truncated = True
             reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1) * 10
         else:
