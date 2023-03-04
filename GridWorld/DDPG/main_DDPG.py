@@ -3,7 +3,6 @@ import control.optimal as opt
 from GridWorld.DDPG.ddpg_backend import Agent
 import numpy as np
 import gymnasium as gym
-import gym as old_gym
 from gymnasium.wrappers import FlattenObservation
 
 SIZE = 10
