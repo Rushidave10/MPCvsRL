@@ -7,15 +7,16 @@ from gymnasium import spaces
 
 class GridWorldEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
-    Random = False
 
-    def __init__(self, render_mode=None, size=5):
+    def __init__(self, render_mode=None, size=5, random_start=False, random_target=False):
         self._target_location = None
         self._agent_location = None
         self.size = size
         self.window_size = 800
         self.no_cells = self.size % self.window_size
         self.mesh = np.zeros((self.no_cells, self.no_cells))
+        self.Random_target = random_target
+        self.Random_start = random_start
 
         self.observation_space = spaces.Box(0, size - 1, shape=(2,), dtype=int)
         self.action_space = gym.spaces.Box(-1, +1, shape=(2,))
@@ -31,21 +32,22 @@ class GridWorldEnv(gym.Env):
 
     def _get_info(self):
         return {
-            "distance": np.linalg.norm(
-                self._agent_location - self._target_location, ord=1
-            )
+            "target_location": self._target_location,
+            "agent_location": self._agent_location
         }
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
-
-        self._agent_location = np.array([0, 0])
+        if self.Random_start:
+            self._agent_location = np.random.randint(0, self.size - 1, size=2)
+        else:
+            self._agent_location = np.array([0, 0])
 
         self._target_location = self._agent_location
         while np.array_equal(self._target_location, np.floor(self._agent_location)):
 
             self.mesh = np.zeros((self.no_cells, self.no_cells))
-            if self.Random:
+            if self.Random_target:
                 self._target_location = self.np_random.integers(0, self.size, size=2, dtype=int)
             else:
                 self._target_location = np.array([self.size - 1, self.size - 1])
@@ -72,9 +74,9 @@ class GridWorldEnv(gym.Env):
         if np.array_equal(self._agent_location, self._target_location):
             terminated = True
             reward = +100
-        elif np.max(self.mesh) == 5:
+        elif np.max(self.mesh) == 200:
             truncated = True
-            reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1)*10
+            reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1) * 10
         else:
             terminated = False
             reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1)
@@ -107,7 +109,7 @@ class GridWorldEnv(gym.Env):
 
         for i in range(self.no_cells):
             for j in range(self.no_cells):
-                pygame.draw.rect(canvas, (255 - self.mesh[i, j]*1, 255, 255),
+                pygame.draw.rect(canvas, (255 - self.mesh[i, j] * 1, 255, 255),
                                  pygame.Rect([pix_square_size * i, pix_square_size * j],
                                              (pix_square_size, pix_square_size)))
 
@@ -141,4 +143,3 @@ class GridWorldEnv(gym.Env):
         if self.window is not None:
             pygame.display.quit()
             pygame.quit()
-
