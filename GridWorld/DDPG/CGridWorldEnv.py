@@ -14,7 +14,7 @@ class GridWorldEnv(gym.Env):
         self.size = size
         self.window_size = 800
         self.no_cells = self.size % self.window_size
-        self.mesh = np.zeros((self.no_cells, self.no_cells))
+        self.vmesh = np.zeros((self.no_cells, self.no_cells))
         self.Random_target = random_target
         self.Random_start = random_start
 
@@ -46,7 +46,6 @@ class GridWorldEnv(gym.Env):
         self._target_location = self._agent_location
         while np.array_equal(self._target_location, np.floor(self._agent_location)):
 
-            self.mesh = np.zeros((self.no_cells, self.no_cells))
             if self.Random_target:
                 self._target_location = self.np_random.integers(0, self.size, size=2, dtype=int)
             else:
@@ -69,12 +68,13 @@ class GridWorldEnv(gym.Env):
         for i in range(self.no_cells):
             for j in range(self.no_cells):
                 if (np.floor(self._agent_location) == np.array([i, j])).all():
-                    self.mesh[i, j] += 1
+                    if self.vmesh[i, j] <= 127:
+                        self.vmesh[i, j] += 1
 
         if np.array_equal(self._agent_location, self._target_location):
             terminated = True
             reward = +100
-        elif np.max(self.mesh) == 200:
+        elif np.max(self.vmesh) == 127:
             truncated = True
             reward = -np.linalg.norm(self._agent_location - self._target_location, ord=1) * 10
         else:
@@ -109,7 +109,9 @@ class GridWorldEnv(gym.Env):
 
         for i in range(self.no_cells):
             for j in range(self.no_cells):
-                pygame.draw.rect(canvas, (255 - self.mesh[i, j] * 1, 255, 255),
+                pygame.draw.rect(canvas, (255 - self.vmesh[i, j] * 2,
+                                          255 - self.vmesh[i, j] * 2,
+                                          255 - self.vmesh[i, j] * 2),
                                  pygame.Rect([pix_square_size * i, pix_square_size * j],
                                              (pix_square_size, pix_square_size)))
 

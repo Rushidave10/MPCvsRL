@@ -3,6 +3,7 @@ import control.optimal as opt
 from GridWorld.DDPG.ddpg_backend import Agent
 import numpy as np
 import gymnasium as gym
+import gym as old_gym
 from gymnasium.wrappers import FlattenObservation
 
 SIZE = 10
@@ -37,7 +38,7 @@ horizon = 5  # Horizon Length
 np.random.seed(0)
 score_history = []
 
-for i in range(30):
+for i in range(50):
     obs, info = env.reset()
     xf = info["target_location"]
     traj_cost = opt.quadratic_cost(sys=sys, Q=Q, R=None, x0=xf)
@@ -66,7 +67,7 @@ for i in range(30):
         agent.learn()
         score += reward
         k += 1
-        MPC = True if eps < np.random.rand(1) and i < 15 else False
+        MPC = True if eps < np.random.rand(1) and i < 30 else False
 
         obs = new_state
         env.render()
